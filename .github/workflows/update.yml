@@ -1,4 +1,4 @@
-name: Update Gold and USD Data
+name: gold-silver-usd-tracker
 
 on:
   workflow_dispatch:
