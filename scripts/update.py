@@ -7,6 +7,17 @@ from datetime import datetime
 
 SELECTOR = 'span.price[data-col="info.last_trade.PDrCotVal"]'
 
+HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/126.0.0.0 Safari/537.36"
+    ),
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Language": "fa-IR,fa;q=0.9,en-US;q=0.8,en;q=0.7",
+    "Referer": "https://www.tgju.org/",
+}
+
 
 PAGES = [
     {
@@ -24,6 +35,14 @@ PAGES = [
     {
         "key": "ounce",
         "url": "https://www.tgju.org/profile/ons"
+    },
+    {
+        "key": "silver_ounce",
+        "url": "https://www.tgju.org/profile/silver"
+    },
+    {
+        "key": "silver_price",
+        "url": "https://www.tgju.org/profile/silver_999"
     }
 ]
 
@@ -33,7 +52,12 @@ def fetch_price(url):
     دریافت قیمت از یک صفحه TGJU
     """
 
-    response = requests.get(url)
+    response = requests.get(url, headers=HEADERS, timeout=15)
+
+    if response.status_code != 200:
+        raise Exception(
+            f"Request failed for {url} -> status {response.status_code}"
+        )
 
     soup = BeautifulSoup(
         response.text,
@@ -43,7 +67,9 @@ def fetch_price(url):
     price_element = soup.select_one(SELECTOR)
 
     if price_element is None:
-        raise Exception("Price not found")
+        raise Exception(
+            f"Price not found for {url} (selector may have changed)"
+        )
 
     raw_price = price_element.text.strip()
 
@@ -151,7 +177,9 @@ def save_history(prices):
                     "usd",
                     "gold18",
                     "coin",
-                    "ounce"
+                    "ounce",
+                    "silver_ounce",
+                    "silver_price"
                 ]
             )
 
@@ -166,7 +194,9 @@ def save_history(prices):
                 prices["usd"],
                 prices["gold18"],
                 prices["coin"],
-                prices["ounce"]
+                prices["ounce"],
+                prices["silver_ounce"],
+                prices["silver_price"]
             ]
         )
 
