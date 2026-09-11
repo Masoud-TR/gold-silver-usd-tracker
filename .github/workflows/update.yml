@@ -1,4 +1,3 @@
-```yaml
 name: gold-silver-usd-tracker
 
 on:
@@ -35,4 +34,3 @@ jobs:
           git add data/history.csv
           git diff --cached --quiet || git commit -m "Update market data"
           git push
-```
